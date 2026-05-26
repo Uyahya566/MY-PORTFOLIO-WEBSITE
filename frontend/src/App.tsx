@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { useGLTF, OrbitControls, Stage, Html, useProgress } from '@react-three/drei';
+import { Analytics } from '@vercel/analytics/react';
 import CanvasBackground from './components/CanvasBackground';
 
 import './App.css';
@@ -1281,6 +1282,7 @@ export default function SafeApp() {
   return (
     <ErrorBoundary>
       <App />
+      <Analytics />
     </ErrorBoundary>
   );
 }
