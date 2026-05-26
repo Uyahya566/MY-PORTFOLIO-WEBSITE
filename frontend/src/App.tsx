@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { useGLTF, OrbitControls, Stage, Html, useProgress } from '@react-three/drei';
+import CanvasBackground from './components/CanvasBackground';
 
 import './App.css';
 
@@ -93,8 +94,17 @@ function App() {
   // --- States ---
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
-      return savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      try {
+        const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
+        if (savedTheme) return savedTheme;
+      } catch (e) {
+        console.warn("localStorage read blocked in private browsing mode:", e);
+      }
+      try {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      } catch (e) {
+        return 'dark';
+      }
     }
     return 'dark';
   });
@@ -128,7 +138,6 @@ function App() {
   ]);
 
   // --- Refs ---
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const cliBodyRef = useRef<HTMLDivElement | null>(null);
   const cliInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -159,10 +168,22 @@ function App() {
     card.style.setProperty('--my', '50%');
   };
 
-  // --- Initial Theme Load ---
+  // --- Sync theme changes to document & status bar meta ---
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-  }, []);
+    
+    // Force instant reflow and repaint of root element backgrounds to trigger status bar update
+    const colorValue = theme === 'dark' ? '#030014' : '#f4f6fc';
+    document.documentElement.style.backgroundColor = colorValue;
+    document.body.style.backgroundColor = colorValue;
+    
+    // Dynamically update mobile browser address/status bar color to prevent bar popping
+    // (Uses static index.html tag and cold arctic frost #f4f6fc for perfect light theme status bar transition)
+    const metaThemeColor = document.getElementById('theme-meta') || document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', colorValue);
+    }
+  }, [theme]);
 
   // --- Fetch Projects from Node.js Express API ---
   useEffect(() => {
@@ -206,144 +227,7 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // --- Canvas Particle Animation ---
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
 
-    let animationFrameId: number;
-    type ParticleType = { x: number; y: number; size: number; speedX: number; speedY: number; update: () => void; draw: () => void };
-    let particles: ParticleType[] = [];
-    const mouse = { x: null as number | null, y: null as number | null, radius: 120 };
-    let particleCount = window.innerWidth < 768 ? 40 : 100;
-
-    const resizeCanvas = () => {
-      if (!canvas) return;
-      canvas.width = canvas.parentElement?.offsetWidth || window.innerWidth;
-      canvas.height = canvas.parentElement?.offsetHeight || window.innerHeight;
-      particleCount = window.innerWidth < 768 ? 40 : 100;
-      initParticles();
-    };
-
-    const createParticle = (): ParticleType => {
-      return {
-        x: Math.random() * (canvas?.width || window.innerWidth),
-        y: Math.random() * (canvas?.height || window.innerHeight),
-        size: Math.random() * 2 + 1,
-        speedX: (Math.random() - 0.5) * 0.8,
-        speedY: (Math.random() - 0.5) * 0.8,
-        update() {
-          if (!canvas) return;
-          this.x += this.speedX;
-          this.y += this.speedY;
-
-          if (this.x < 0 || this.x > canvas.width) this.speedX = -this.speedX;
-          if (this.y < 0 || this.y > canvas.height) this.speedY = -this.speedY;
-
-          if (mouse.x !== null && mouse.y !== null) {
-            const dx = mouse.x - this.x;
-            const dy = mouse.y - this.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < mouse.radius) {
-              const forceDirectionX = dx / distance;
-              const forceDirectionY = dy / distance;
-              const force = (mouse.radius - distance) / mouse.radius;
-              const directionX = forceDirectionX * force * 1.5;
-              const directionY = forceDirectionY * force * 1.5;
-
-              this.x -= directionX;
-              this.y -= directionY;
-            }
-          }
-        },
-        draw() {
-          if (!ctx) return;
-          const color = getComputedStyle(document.documentElement).getPropertyValue('--accent-gold').trim() || '#c5a880';
-          ctx.fillStyle = color + '66';
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      };
-    };
-
-    const initParticles = () => {
-      particles = [];
-      for (let i = 0; i < particleCount; i++) {
-        particles.push(createParticle());
-      }
-    };
-
-    const connectParticles = () => {
-      if (!ctx) return;
-      const activeTheme = document.documentElement.getAttribute('data-theme');
-      const lineColor = activeTheme === 'dark' ? '255, 255, 255' : '0, 0, 0';
-
-      for (let a = 0; a < particles.length; a++) {
-        for (let b = a; b < particles.length; b++) {
-          const dx = particles[a].x - particles[b].x;
-          const dy = particles[a].y - particles[b].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 90) {
-            const opacity = 1 - (distance / 90);
-            ctx.strokeStyle = `rgba(${lineColor}, ${opacity * 0.15})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(particles[a].x, particles[a].y);
-            ctx.lineTo(particles[b].x, particles[b].y);
-            ctx.stroke();
-          }
-        }
-      }
-    };
-
-    const animate = () => {
-      if (!canvas || !ctx) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].update();
-        particles[i].draw();
-      }
-      
-      connectParticles();
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    // Listeners
-    window.addEventListener('resize', resizeCanvas);
-    
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
-    };
-
-    const handleMouseLeave = () => {
-      mouse.x = null;
-      mouse.y = null;
-    };
-
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('mouseleave', handleMouseLeave);
-
-    // Initial Trigger
-    resizeCanvas();
-    animate();
-
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      if (canvas) {
-        canvas.removeEventListener('mousemove', handleMouseMove);
-        canvas.removeEventListener('mouseleave', handleMouseLeave);
-      }
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [theme]);
 
   // --- Auto Scroll CLI Terminal ---
   useEffect(() => {
@@ -357,7 +241,11 @@ function App() {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
     document.documentElement.setAttribute('data-theme', nextTheme);
-    localStorage.setItem('theme', nextTheme);
+    try {
+      localStorage.setItem('theme', nextTheme);
+    } catch (e) {
+      console.warn("localStorage write blocked in private browsing mode:", e);
+    }
   };
 
   // --- Terminal Command Handler ---
@@ -554,6 +442,7 @@ function App() {
 
   return (
     <div>
+      <CanvasBackground theme={theme} />
       {/* Navigation Header */}
       <header className={`header ${scrolled ? 'scrolled' : ''}`} id="header">
         <div className="container nav-container">
@@ -591,7 +480,6 @@ function App() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <canvas ref={canvasRef} id="hero-canvas"></canvas>
           <div className="container hero-grid">
             <div className="hero-content">
               <div className="hero-subtitle">

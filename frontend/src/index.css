@@ -7,66 +7,66 @@
 
 /* CSS Theme Variables */
 :root {
-    /* Color Palette - Dark Mode (Monochrome Slate) */
-    --bg-primary: #0a0a0a; /* Pure Dark */
-    --bg-secondary: #141414; /* Slightly lighter */
-    --bg-card: #1a1a1a; 
-    --bg-terminal: #050505;
+    /* Color Palette - Dark Mode ("Cyberpunk Nebula Void") */
+    --bg-primary: #030014; /* Deep outer space indigo-black */
+    --bg-secondary: #080424; /* Nebula dark indigo */
+    --bg-card: rgba(10, 5, 29, 0.45); /* Frosty translucent card */
+    --bg-terminal: rgba(5, 3, 16, 0.85); /* Slightly darker terminal window */
     
-    --border-color: rgba(255, 255, 255, 0.08); 
-    --border-glow: transparent;
+    --border-color: rgba(168, 85, 247, 0.15); /* Translucent neon purple border */
+    --border-glow: rgba(139, 92, 246, 0.35); /* Glowing accent border */
     
     --text-primary: #f5f5f5; /* Crisp White */
     --text-secondary: #a3a3a3; /* Neutral Gray */
-    --text-muted: #737373;
+    --text-muted: #737373; /* Neutral Muted Gray */
     
-    --accent-red: #ffffff; /* Replaced red with pure white for accents */
-    --accent-gold: #a3a3a3; /* Replaced gold with silver */
+    --accent-red: #ffffff; /* Reverted white */
+    --accent-gold: #a3a3a3; /* Reverted silver */
     --accent-champagne: #404040;
-    --accent-gradient: linear-gradient(135deg, #ffffff, #a3a3a3);
+    --accent-gradient: linear-gradient(135deg, #ffffff, #a3a3a3); /* Reverted metallic gradient */
     
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.6);
-    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.8);
-    --shadow-glow: 0 0 0 transparent; 
+    --shadow-sm: 0 4px 12px rgba(3, 0, 20, 0.3);
+    --shadow-md: 0 10px 30px rgba(3, 0, 20, 0.5);
+    --shadow-lg: 0 20px 50px rgba(3, 0, 20, 0.7);
+    --shadow-glow: 0 0 25px rgba(139, 92, 246, 0.25); /* Glowing shadow */
     
     /* Layout & Styling Presets */
     --font-heading: 'Outfit', sans-serif;
     --font-body: 'Inter', sans-serif;
     --font-mono: 'Fira Code', monospace;
-    --border-radius-sm: 4px;
-    --border-radius-md: 8px;
-    --border-radius-lg: 16px;
-    --transition-fast: 0.2s ease-in-out;
-    --transition-normal: 0.4s ease-in-out;
-    --transition-slow: 0.7s ease-in-out;
+    --border-radius-sm: 6px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 24px;
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.7s cubic-bezier(0.4, 0, 0.2, 1);
     
-    --backdrop-blur: blur(0px); 
+    --backdrop-blur: blur(16px); 
 }
 
-/* Light Theme Overrides */
+/* Light Theme Overrides ("Aurora Frost") */
 [data-theme="light"] {
-    --bg-primary: #fafafa; /* Pure Clean White */
-    --bg-secondary: #f0f0f0; /* Light Gray */
-    --bg-card: #ffffff; 
-    --bg-terminal: #0a0a0a; 
+    --bg-primary: #f4f6fc; /* Cold arctic frost */
+    --bg-secondary: #e2e8f5; /* Ice-blue gray */
+    --bg-card: rgba(255, 255, 255, 0.65); /* Translucent bright frost */
+    --bg-terminal: rgba(10, 10, 15, 0.95); /* Dark terminal even in light theme (very coder style!) */
     
-    --border-color: rgba(0, 0, 0, 0.08);
-    --border-glow: transparent;
+    --border-color: rgba(99, 102, 241, 0.12); /* Soft indigo translucent border */
+    --border-glow: rgba(99, 102, 241, 0.25);
     
     --text-primary: #171717; /* Deep Charcoal */
-    --text-secondary: #525252;
-    --text-muted: #a3a3a3;
+    --text-secondary: #525252; /* Neutral Slate */
+    --text-muted: #a3a3a3; /* Light Muted Gray */
     
-    --accent-red: #0a0a0a; /* Deep Charcoal instead of red */
-    --accent-gold: #525252; 
+    --accent-red: #0a0a0a; /* Reverted charcoal */
+    --accent-gold: #525252; /* Reverted gray */
     --accent-champagne: #e5e5e5;
-    --accent-gradient: linear-gradient(135deg, #171717, #525252);
+    --accent-gradient: linear-gradient(135deg, #171717, #525252); /* Reverted dark metallic gradient */
     
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.02);
-    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.05);
-    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.1);
-    --shadow-glow: 0 0 0 transparent;
+    --shadow-sm: 0 4px 12px rgba(99, 102, 241, 0.04);
+    --shadow-md: 0 10px 30px rgba(99, 102, 241, 0.08);
+    --shadow-lg: 0 20px 50px rgba(99, 102, 241, 0.12);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
 }
 
 /* ==========================================
@@ -89,14 +89,20 @@ html, body {
 html {
     scroll-behavior: smooth;
     font-size: 16px;
+    background-color: var(--bg-primary); /* Prevents default browser white background from leaking during mobile scroll bounces */
 }
 
 body {
-    background-color: var(--bg-primary);
+    background-color: var(--bg-primary); /* Solid color covers native browser window safe areas entirely */
     color: var(--text-primary);
     font-family: var(--font-body);
     line-height: 1.6;
-    transition: background-color var(--transition-normal), color var(--transition-normal);
+    transition: color var(--transition-normal);
+}
+
+main {
+    position: relative;
+    z-index: 1; /* Renders content layers on top of z-index 0 canvas background */
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -167,6 +173,17 @@ ul {
     backdrop-filter: var(--backdrop-blur);
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-md);
+    transition: border-color var(--transition-normal), box-shadow var(--transition-normal), background-color var(--transition-normal);
+}
+
+.glass:hover {
+    border-color: var(--border-glow);
+    box-shadow: var(--shadow-glow), var(--shadow-md);
+    background: rgba(10, 5, 29, 0.55);
+}
+
+[data-theme="light"] .glass:hover {
+    background: rgba(255, 255, 255, 0.75);
 }
 
 .glow-border {
@@ -180,12 +197,12 @@ ul {
     background: var(--accent-gradient);
     border-radius: inherit;
     z-index: -1;
-    opacity: 0.15;
+    opacity: 0.12;
     transition: opacity var(--transition-normal);
 }
 
 .glow-border:hover::after {
-    opacity: 0.4;
+    opacity: 0.35;
 }
 
 .section {
@@ -374,7 +391,8 @@ ul {
     left: 0;
     width: 100%;
     z-index: 1000;
-    transition: background-color var(--transition-normal), border-bottom var(--transition-normal);
+    background: var(--bg-primary); /* Solid background always visible — prevents mobile notch from showing white */
+    transition: background-color var(--transition-normal), border-bottom var(--transition-normal), box-shadow var(--transition-normal);
 }
 
 .header.scrolled {
@@ -1458,6 +1476,8 @@ textarea.form-input {
     padding: 4rem 0 2rem 0;
     border-top: 1px solid var(--border-color);
     background: var(--bg-secondary);
+    position: relative;
+    z-index: 1;
 }
 
 .footer-content {

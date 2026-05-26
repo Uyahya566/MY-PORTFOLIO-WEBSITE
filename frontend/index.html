@@ -3,8 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23070a11%22/><text x=%2250%22 y=%2255%22 font-size=%2250%22 font-family=%22sans-serif%22 font-weight=%22bold%22 fill=%22%23c5a880%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>UY</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Premium developer portfolio displaying software engineering projects, experience timeline, and interactive console controls." />
+    <meta name="theme-color" id="theme-meta" content="#030014" />
+    
+    <style>
+      html, body {
+        background-color: #030014;
+      }
+      [data-theme="light"], [data-theme="light"] body {
+        background-color: #f4f6fc;
+      }
+    </style>
+    
+    <script>
+      (function() {
+        try {
+          const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', savedTheme);
+          const meta = document.getElementById('theme-meta');
+          if (meta) {
+            meta.setAttribute('content', savedTheme === 'dark' ? '#030014' : '#f4f6fc');
+          }
+        } catch(e) {}
+      })();
+    </script>
     <title>Umar Yahya</title>
     
     <!-- FontAwesome for Premium Icons -->
